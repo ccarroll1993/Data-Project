@@ -1,12 +1,13 @@
 import bs4
 import urllib.request
 import csv
+import JobDetails
 
 soup = bs4.BeautifulSoup
 uReq = urllib.request.urlopen
 
 
-web_url = 'https://www.indeed.com/jobs?q=software%20test%20engineer&l=Saint%20Peters%2C%20MO&vjk=f103b96aa29d0045&limit=50'
+web_url = 'https://www.indeed.com/jobs?q=business+intelligence&l=Santa+Clara,+CA&limit=50'
 # opening url connection
 webConnect = uReq(web_url)
 # creating url page refernce for parsing
@@ -20,10 +21,9 @@ webPage_soup = soup(webPage, "html.parser")
 #Creating list of job selection\
 jobList = webPage_soup.findAll("div", class_="jobsearch-SerpJobCard unifiedRow row result")
 
-
 #setup csv file
 with open('./JobSearch.csv', 'w', newline = '') as JobSearch:
-	headers = ['Title', 'Company', 'Company Rating', 'Location', 'Indeed Estimated Salary', 'Days Posted', 'Remote?', 'New?', 'Urgently Hiring?', 'Job Posting']
+	headers = ['Title', 'Company', 'Company Rating', 'Location', 'Indeed Estimated Salary', 'Keywords', 'Min Experience', 'Max Experience', 'Days Posted', 'Remote?', 'New?', 'Urgently Hiring?', 'Job Posting']
 	jobwriter = csv.DictWriter(JobSearch, fieldnames=headers)
 
 
@@ -74,22 +74,40 @@ with open('./JobSearch.csv', 'w', newline = '') as JobSearch:
 
 		# Urgently hiring?:
 		try:
-			urgHire = jobList[0].find("td", class_="jobCardShelfItem urgentlyHiring").contents[0]
+			urgHire = jobs.find("td", class_="jobCardShelfItem urgentlyHiring").contents[0]
 			if urgHire:
 				job_Hire = "Urgent"
 		except:
 			job_Hire = ""
 
 		# Job Posting:
-		job_posting = "https://www.indeed.com" + jobList[0].h2.a["href"]
+		job_posting = "https://www.indeed.com" + jobs.h2.a["href"]
 
-		# 
+		# Keywords:
+		job_keywords = JobDetails.skills(job_posting)
+
+		# Minimum Experience:
+		try:
+			job_MinExperience = JobDetails.experience(job_posting)[0]
+		except:
+			job_MinExperience = ""
+
+		# Maximum Experience:
+		try:
+			job_MaxExperience = JobDetails.experience(job_posting)[-1]
+		except:
+			job_MaxExperience = ""
+
+		# Defining Dictionary
 		job_dict = {
 			'Title': job_title,
 			'Company': job_company,
 			'Company Rating': job_rating,
 			'Location': job_location,
 			'Indeed Estimated Salary': job_salary,
+			'Keywords': job_keywords,
+			'Min Experience': job_MinExperience,
+			'Max Experience': job_MaxExperience,
 			'Days Posted': job_days,
 			'Remote?': job_remote,
 			'New?': job_new,
