@@ -5,6 +5,6 @@ This is a project of webscraping job postings from Indeed. There is much more I'
     Job title, company, company's rating, job location, salary, days posted, remote or not, new job or not, if the job is urgently hiring and job posting's url.
 - Add results to excel spreadsheet (Complete)
 - Add "minimum experience", "maximum experience" and "job skills" columns to results (Complete)
-- Load these results into a database
+- Load these results into a database (Complete)
 - Create a report of the job postings
 - Create a SQL job to automate table refresh and reporting
